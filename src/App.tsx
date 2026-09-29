@@ -1,7 +1,4 @@
 import { useState, useEffect } from "react";
-import { useUser } from "./context/user-context";
-
-import Navbar from "./components/navbar";
 
 type Posts = {
   id: string;
@@ -11,7 +8,6 @@ type Posts = {
 };
 
 function App() {
-  const { user, loading } = useUser();
   const [books, setBooks] = useState<Posts[] | []>([]);
 
   const getBooks = async () => {
@@ -27,8 +23,6 @@ function App() {
   return (
     <div className="min-h-screen bg-[#f3f5f0] font-(family-name:--font-body) text-[#20342f]">
       <div className="mx-auto max-w-7xl px-5 pb-14 sm:px-8">
-        <Navbar user={user} loading={loading} />
-
         <main id="inicio">
           <section className="relative isolate mt-7 min-h-86.25 overflow-hidden rounded-lg bg-[#203b34] px-6 py-10 text-[#f5f2e9] sm:px-10 sm:py-12 lg:px-14">
             <div

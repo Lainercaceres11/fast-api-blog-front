@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../context/user-context";
-import { useNavigate } from "react-router";
+
+import Post from "./blogs/post";
 
 type Blog = {
   id: number;
@@ -9,10 +10,9 @@ type Blog = {
 };
 
 export default function HomeUser() {
-  const { user, logout } = useUser();
+  const { user } = useUser();
 
   const [blogs, setBlogs] = useState<Blog[]>([]);
-  const navigate = useNavigate();
 
   const getBlogs = async () => {
     if (!user) return;
@@ -40,6 +40,10 @@ export default function HomeUser() {
     setBlogs(blog.data);
   };
 
+  const handleDeleteBlog = (id: number) => {
+    setBlogs((blog) => blog.filter((blog) => blog.id != id));
+  };
+
   useEffect(() => {
     if (user) {
       getBlogs();
@@ -56,49 +60,8 @@ export default function HomeUser() {
     .map((part) => part[0])
     .join("");
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   return (
     <div className="min-h-screen bg-[#f3f5f0] font-(family-name:--font-body) text-[#20342f]">
-      <header className="border-b border-[#dce3dd] bg-[#f8f9f5]">
-        <div className="mx-auto flex min-h-18 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
-          <a
-            className="inline-flex shrink-0 items-center gap-2.25 text-[25px] font-bold text-[#20342f] no-underline"
-            href="/"
-            aria-label="Margen, inicio"
-          >
-            <span className="flex h-5 items-end gap-0.5" aria-hidden="true">
-              <i className="h-3.5 w-1.25 rounded-t-sm bg-[#e1795b]" />
-              <i className="h-4.75 w-1.25 rounded-t-sm bg-[#395e50]" />
-              <i className="h-2.75 w-1.25 rounded-t-sm bg-[#d8ae59]" />
-            </span>
-            <span>
-              margen<span className="text-[#e1795b]">.</span>
-            </span>
-          </a>
-          <nav className="flex items-center gap-5 text-xs font-semibold">
-            <a
-              className="hidden text-[#39554a] no-underline sm:inline"
-              href="#blogs"
-            >
-              Mis blogs
-            </a>
-            <button
-              className="text-[#738079] no-underline transition hover:text-[#20342f]"
-              onClick={handleLogout}
-            >
-              Cerrar sesión
-            </button>
-            <span className="grid size-9 shrink-0 place-items-center rounded-full border border-[#d8c89c] bg-[#f0e7d2] font-(family-name:--font-display) text-sm text-[#39554a]">
-              {initials}
-            </span>
-          </nav>
-        </div>
-      </header>
-
       <section className="mx-auto max-w-7xl px-5 pb-16 pt-8 sm:px-8 sm:pt-11">
         <div className="mb-8 flex flex-col gap-5 border-b border-[#dce3dd] pb-7 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -140,32 +103,12 @@ export default function HomeUser() {
             <div className="divide-y divide-[#dce3dd]">
               {blogs.length > 0 ? (
                 blogs.map((blog, index) => (
-                  <article className="group py-5 first:pt-2" key={blog.id}>
-                    <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-[9px] font-bold tracking-[1px]">
-                      <span className="text-[#c2694e]">{blog.title}</span>
-                      <span className="h-1 w-1 rounded-full bg-[#d8ae59]" />
-                    </div>
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <h3 className="font-(family-name:--font-display) text-[22px] font-normal leading-snug text-[#203b34] transition group-hover:text-[#a6533d] sm:text-2xl">
-                          {blog.title}
-                        </h3>
-                      </div>
-                      <button
-                        className="mt-1 grid size-8 shrink-0 place-items-center rounded-full border border-[#d9e0d9] text-sm text-[#55705f] transition hover:border-[#9bac9f] hover:bg-[#e9eee7]"
-                        type="button"
-                        aria-label={`Abrir ${blog.title}`}
-                      >
-                        ↗
-                      </button>
-                    </div>
-                    {index === 0 && (
-                      <div
-                        className="mt-4 h-px w-10 bg-[#dfa17b]"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </article>
+                  <Post
+                    userId={user.id}
+                    blog={blog}
+                    index={index}
+                    onGetPost={() => handleDeleteBlog(blog.id)}
+                  />
                 ))
               ) : (
                 <p>Aun no tienes blogs</p>
