@@ -32,39 +32,39 @@ export default function Post({
     }
   };
   return (
-    <article className="group py-5 first:pt-2" key={blog.id}>
-      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-[9px] font-bold tracking-[1px]">
-        <span className="text-[#c2694e]">{blog.title}</span>
-        <span className="h-1 w-1 rounded-full bg-[#d8ae59]" />
-      </div>
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <h3 className="font-(family-name:--font-display) text-[22px] font-normal leading-snug text-[#203b34] transition group-hover:text-[#a6533d] sm:text-2xl">
-            {blog.content}
-          </h3>
+    <article
+      className="group flex flex-col gap-4 py-5 first:pt-2 sm:flex-row sm:items-center sm:justify-between"
+      key={blog.id}
+    >
+      <div className="min-w-0 flex-1">
+        <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-[9px] font-bold tracking-[1px]">
+          <span className="text-[#c2694e]">{blog.title}</span>
+          <span className="h-1 w-1 rounded-full bg-[#d8ae59]" />
         </div>
-        <button
-          className="mt-1 grid size-8 shrink-0 place-items-center rounded-full border border-[#d9e0d9] text-sm text-[#55705f] transition hover:border-[#9bac9f] hover:bg-[#e9eee7]"
-          type="button"
-          aria-label={`Abrir ${blog.title}`}
+        <h3 className="font-(family-name:--font-display) text-[22px] font-normal leading-snug text-[#203b34] transition group-hover:text-[#a6533d] sm:text-2xl">
+          {blog.content}
+        </h3>
+      </div>
+      <div
+        className="flex shrink-0 items-center gap-2"
+        aria-label="Acciones del post"
+      >
+        <Link
+          to={`/edit-post/${userId}/${blog.id}`}
+          className="inline-flex min-h-9 items-center justify-center gap-2 rounded-sm border border-[#cbd7ce] px-3 text-[11px] font-semibold text-[#39554a] transition hover:border-[#557565] hover:bg-[#e8eee8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#557565]"
+          aria-label={`Editar ${blog.title}`}
         >
-          ↗
+          Editar
+        </Link>
+        <button
+          onClick={() => handleDeletePost(blog.id)}
+          className="inline-flex min-h-9 items-center justify-center gap-2 rounded-sm border border-[#ead2c9] px-3 text-[11px] font-semibold text-[#a6533d] transition hover:border-[#c2694e] hover:bg-[#fbefeb] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c2694e]"
+          type="button"
+          aria-label={`Eliminar ${blog.title}`}
+        >
+          Eliminar
         </button>
       </div>
-      <button
-        onClick={() => handleDeletePost(blog.id)}
-        className="mt-1 grid size-8 shrink-0 place-items-center rounded-full border border-[#d9e0d9] text-sm text-[#55705f] transition hover:border-[#9bac9f] hover:bg-[#e9eee7]"
-        aria-label={`Delete post`}
-      >
-        ❌
-      </button>
-      <Link
-        to={`/edit-post/${userId}/${blog.id}`}
-        className="mt-1 grid size-8 shrink-0 place-items-center rounded-full border border-[#d9e0d9] text-sm text-[#55705f] transition hover:border-[#9bac9f] hover:bg-[#e9eee7]"
-        aria-label="Editar post"
-      >
-        Editar
-      </Link>
       {index === 0 && (
         <div className="mt-4 h-px w-10 bg-[#dfa17b]" aria-hidden="true" />
       )}
