@@ -9,11 +9,14 @@ type Posts = {
 
 function App() {
   const [books, setBooks] = useState<Posts[] | []>([]);
+  const [loading, setLoading] = useState(true);
 
   const getBooks = async () => {
+    setLoading(true);
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/posts`);
     const booksJson = await response.json();
     setBooks(booksJson.data);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -101,40 +104,44 @@ function App() {
             </div>
 
             <div className="mt-7 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
-              {books.map((book) => {
-                return (
-                  <article
-                    className="min-w-0 rounded border border-[#dce3dd] bg-[#fbfcf9] px-6 py-5.75 pb-4.75 transition hover:-translate-y-0.5 hover:border-[#9bac9f]"
-                    key={book.id}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="inline-flex items-center gap-1.75 text-[9px] font-bold tracking-[1.2px] text-[#c2694e]">
-                        <i className="h-1.5 w-1.5 rounded-full bg-[#d17a5b]" />{" "}
-                        PUBLICACIÓN
-                      </span>
-                      <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[9px] tracking-[0.7px] text-[#87928b]">
-                        AUTOR ID / {book.author_id}
-                      </span>
-                    </div>
-                    <h3 className="mt-5.25 wrap-anywhere font-(family-name:--font-display) text-[25px] font-normal leading-[1.2] text-[#203b34]">
-                      {book.title}
-                    </h3>
-                    <div className="mt-4.25 h-0.5 w-8 bg-[#dfa17b]" />
-                    <p className="mt-3.5 line-clamp-3 min-h-[5.4em] text-[13px] leading-[1.8] text-[#63736a]">
-                      {book.content}
-                    </p>
-                    <div className="mt-5 flex items-center justify-between border-t border-[#e7ebe5] pt-3.25 text-[8px] font-bold tracking-[1px] text-[#96a098]">
-                      <span>MARGEN / APUNTES</span>
-                      <span
-                        className="text-[15px] text-[#567361]"
-                        aria-hidden="true"
-                      >
-                        ↗
-                      </span>
-                    </div>
-                  </article>
-                );
-              })}
+              {!loading ? (
+                books.map((book) => {
+                  return (
+                    <article
+                      className="min-w-0 rounded border border-[#dce3dd] bg-[#fbfcf9] px-6 py-5.75 pb-4.75 transition hover:-translate-y-0.5 hover:border-[#9bac9f]"
+                      key={book.id}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="inline-flex items-center gap-1.75 text-[9px] font-bold tracking-[1.2px] text-[#c2694e]">
+                          <i className="h-1.5 w-1.5 rounded-full bg-[#d17a5b]" />{" "}
+                          PUBLICACIÓN
+                        </span>
+                        <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[9px] tracking-[0.7px] text-[#87928b]">
+                          AUTOR ID / {book.author_id}
+                        </span>
+                      </div>
+                      <h3 className="mt-5.25 wrap-anywhere font-(family-name:--font-display) text-[25px] font-normal leading-[1.2] text-[#203b34]">
+                        {book.title}
+                      </h3>
+                      <div className="mt-4.25 h-0.5 w-8 bg-[#dfa17b]" />
+                      <p className="mt-3.5 line-clamp-3 min-h-[5.4em] text-[13px] leading-[1.8] text-[#63736a]">
+                        {book.content}
+                      </p>
+                      <div className="mt-5 flex items-center justify-between border-t border-[#e7ebe5] pt-3.25 text-[8px] font-bold tracking-[1px] text-[#96a098]">
+                        <span>MARGEN / APUNTES</span>
+                        <span
+                          className="text-[15px] text-[#567361]"
+                          aria-hidden="true"
+                        >
+                          ↗
+                        </span>
+                      </div>
+                    </article>
+                  );
+                })
+              ) : (
+                <p className="text-center">Cargando post...</p>
+              )}
             </div>
           </section>
         </main>

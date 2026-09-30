@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useNavigate } from "react-router";
 
 type FormField = {
@@ -7,6 +7,8 @@ type FormField = {
 };
 
 export default function CreatePost() {
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const navigate = useNavigate();
   const [form, setForm] = useState<FormField>({
     title: "",
@@ -24,21 +26,29 @@ export default function CreatePost() {
   const handleSubmit = async (event: React.SubmitEvent) => {
     event.preventDefault();
 
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/posts`, {
-      method: "POST",
-      body: JSON.stringify(form),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-      },
-    });
-    const data = await response.json();
+    startTransition(async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/posts`,
+        {
+          method: "POST",
+          body: JSON.stringify(form),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        },
+      );
+      const data = await response.json();
 
-    if (response.ok) {
-      navigate("/home");
-    } else {
-      console.error(data);
-    }
+      if (response.ok) {
+        navigate("/home", {
+          viewTransition: true,
+        });
+      } else {
+        console.error(data);
+        setError("No se pudo crear el post, revisa los campos.");
+      }
+    });
   };
   return (
     <div className="min-h-screen bg-[#f3f5f0] bg-[radial-gradient(#39554a0c_0.7px,transparent_0.7px)] bg-size-[9px_9px] px-[5%] font-(family-name:--font-body) text-[#20342f]">
@@ -118,6 +128,7 @@ export default function CreatePost() {
             <label className="grid gap-1.75 text-[11px] font-bold text-[#39554a]">
               <span>Titulo</span>
               <input
+                required
                 value={form.title}
                 onChange={handleChangeForm}
                 className="min-h-11.5 w-full rounded-xs border border-[#d5ded6] bg-[#fbfcf9] px-3.25 text-xs font-normal text-[#20342f] outline-none transition focus:border-[#557565] focus:ring-[3px] focus:ring-[#557565]/10"
@@ -129,6 +140,7 @@ export default function CreatePost() {
             <label className="grid gap-1.75 text-[11px] font-bold text-[#39554a]">
               <span>Contenido</span>
               <input
+                required
                 value={form.content}
                 onChange={handleChangeForm}
                 className="min-h-11.5 w-full rounded-xs border border-[#d5ded6] bg-[#fbfcf9] px-3.25 text-xs font-normal text-[#20342f] outline-none transition focus:border-[#557565] focus:ring-[3px] focus:ring-[#557565]/10"
@@ -138,15 +150,18 @@ export default function CreatePost() {
               />
             </label>
             <button
-              className="mt-1 flex min-h-12 items-center justify-between rounded-xs border border-[#203b34] bg-[#203b34] px-4 text-xs font-semibold text-[#f5f2e9] transition hover:border-[#395e50] hover:bg-[#395e50]"
+              disabled={isPending}
+              className="mt-1 flex min-h-12 items-center justify-between rounded-xs border border-[#203b34] bg-[#203b34] px-4 text-xs font-semibold text-[#f5f2e9] transition hover:border-[#395e50] hover:bg-[#395e50] disabled:bg-gray-500"
               type="submit"
             >
-              Crear post
+              {isPending ? "Creando post..." : "Crear post"}
               <span className="text-[17px] text-[#e7b875]" aria-hidden="true">
                 ↗
               </span>
             </button>
           </form>
+
+          {error && <p className="text-red-500 m-2 font-bold">{error}</p>}
           <p className="mt-3.75 text-center text-[10px] leading-[1.6] text-[#87928b]">
             Tus ideas te esperan justo donde las dejaste.
           </p>

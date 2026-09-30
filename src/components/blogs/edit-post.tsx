@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useNavigate, useParams } from "react-router";
 import type { Blog } from "../../types/user";
 
@@ -8,6 +8,7 @@ type FormField = {
 };
 
 export default function EditPost() {
+  const [isPending, startTransition] = useTransition();
   const { user_id, blog_id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState<FormField>({
@@ -25,7 +26,12 @@ export default function EditPost() {
       const blogId = Number(blog_id);
       const token = localStorage.getItem("access_token");
 
-      if (!user_id || !blog_id || !Number.isFinite(userId) || !Number.isFinite(blogId)) {
+      if (
+        !user_id ||
+        !blog_id ||
+        !Number.isFinite(userId) ||
+        !Number.isFinite(blogId)
+      ) {
         setError("La ruta no contiene un usuario o post válido.");
         setLoading(false);
         return;
@@ -91,33 +97,36 @@ export default function EditPost() {
       setError("No se pudo identificar el post o la sesión.");
       return;
     }
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/posts/${blog_id}`,
-        {
-          method: "PUT",
-          body: JSON.stringify(form),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+    startTransition(async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/posts/${blog_id}`,
+          {
+            method: "PUT",
+            body: JSON.stringify(form),
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           },
-        },
-      );
+        );
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message ?? "No se pudo actualizar el post.");
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.message ?? "No se pudo actualizar el post.");
+        }
+
+        navigate("/home", {
+          viewTransition: true,
+        });
+      } catch (requestError) {
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Ocurrió un error al actualizar el post.",
+        );
       }
-
-      navigate("/home");
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "Ocurrió un error al actualizar el post.",
-      );
-    }
+    });
   };
   return (
     <div className="min-h-screen bg-[#f3f5f0] bg-[radial-gradient(#39554a0c_0.7px,transparent_0.7px)] bg-size-[9px_9px] px-[5%] font-(family-name:--font-body) text-[#20342f]">
@@ -197,40 +206,42 @@ export default function EditPost() {
             <p role="status">Cargando post...</p>
           ) : (
             <form onSubmit={handleSubmit} className="grid gap-4.25">
-            <label className="grid gap-1.75 text-[11px] font-bold text-[#39554a]">
-              <span>Titulo</span>
-              <input
-                defaultValue={form.title}
-                value={form.title}
-                onChange={handleChangeForm}
-                className="min-h-11.5 w-full rounded-xs border border-[#d5ded6] bg-[#fbfcf9] px-3.25 text-xs font-normal text-[#20342f] outline-none transition focus:border-[#557565] focus:ring-[3px] focus:ring-[#557565]/10"
-                name="title"
-                placeholder="Titulo..."
-                type="text"
-              />
-            </label>
-            <label className="grid gap-1.75 text-[11px] font-bold text-[#39554a]">
-              <span>Contenido</span>
-              <input
-                defaultValue={form.content}
-                value={form.content}
-                onChange={handleChangeForm}
-                className="min-h-11.5 w-full rounded-xs border border-[#d5ded6] bg-[#fbfcf9] px-3.25 text-xs font-normal text-[#20342f] outline-none transition focus:border-[#557565] focus:ring-[3px] focus:ring-[#557565]/10"
-                name="content"
-                placeholder="Contenido del post"
-                type="text"
-              />
-            </label>
-            <button
-              disabled={Boolean(error)}
-              className="mt-1 flex min-h-12 items-center justify-between rounded-xs border border-[#203b34] bg-[#203b34] px-4 text-xs font-semibold text-[#f5f2e9] transition hover:border-[#395e50] hover:bg-[#395e50]"
-              type="submit"
-            >
-              Editar post
-              <span className="text-[17px] text-[#e7b875]" aria-hidden="true">
-                ↗
-              </span>
-            </button>
+              <label className="grid gap-1.75 text-[11px] font-bold text-[#39554a]">
+                <span>Titulo</span>
+                <input
+                  required
+                  defaultValue={form.title}
+                  value={form.title}
+                  onChange={handleChangeForm}
+                  className="min-h-11.5 w-full rounded-xs border border-[#d5ded6] bg-[#fbfcf9] px-3.25 text-xs font-normal text-[#20342f] outline-none transition focus:border-[#557565] focus:ring-[3px] focus:ring-[#557565]/10"
+                  name="title"
+                  placeholder="Titulo..."
+                  type="text"
+                />
+              </label>
+              <label className="grid gap-1.75 text-[11px] font-bold text-[#39554a]">
+                <span>Contenido</span>
+                <input
+                  required
+                  defaultValue={form.content}
+                  value={form.content}
+                  onChange={handleChangeForm}
+                  className="min-h-11.5 w-full rounded-xs border border-[#d5ded6] bg-[#fbfcf9] px-3.25 text-xs font-normal text-[#20342f] outline-none transition focus:border-[#557565] focus:ring-[3px] focus:ring-[#557565]/10"
+                  name="content"
+                  placeholder="Contenido del post"
+                  type="text"
+                />
+              </label>
+              <button
+                disabled={isPending}
+                className="mt-1 flex min-h-12 items-center justify-between rounded-xs border border-[#203b34] bg-[#203b34] px-4 text-xs font-semibold text-[#f5f2e9] transition hover:border-[#395e50] hover:bg-[#395e50] disabled:bg-gray-500"
+                type="submit"
+              >
+                {isPending ? "Editando..." : "Editar post"}
+                <span className="text-[17px] text-[#e7b875]" aria-hidden="true">
+                  ↗
+                </span>
+              </button>
             </form>
           )}
           {error && (

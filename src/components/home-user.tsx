@@ -13,13 +13,21 @@ export default function HomeUser() {
   const { user } = useUser();
 
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const getBlogs = async () => {
-    if (!user) return;
+    setLoading(true);
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     const token = localStorage.getItem("access_token");
 
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     const response = await fetch(
       `${import.meta.env.VITE_BACKEND_URL}/posts/user/${user.id}`,
@@ -32,12 +40,14 @@ export default function HomeUser() {
 
     if (!response.ok) {
       console.error("Error obteniendo los blogs");
+      setLoading(false);
       return;
     }
 
     const blog = await response.json();
 
     setBlogs(blog.data);
+    setLoading(false);
   };
 
   const handleDeleteBlog = (id: number) => {
@@ -51,7 +61,11 @@ export default function HomeUser() {
   }, [user]);
 
   if (!user) {
-    return <div>Cargando...</div>;
+    return (
+      <div className="grid min-h-screen items-center justify-center">
+        Loading user...
+      </div>
+    );
   }
 
   const initials = user?.fullname
@@ -101,7 +115,11 @@ export default function HomeUser() {
             </div>
 
             <div className="divide-y divide-[#dce3dd]">
-              {blogs.length > 0 ? (
+              {loading ? (
+                <p>Loading post...</p>
+              ) : blogs.length === 0 ? (
+                <p>No tienes post</p>
+              ) : (
                 blogs.map((blog, index) => (
                   <Post
                     userId={user.id}
@@ -110,8 +128,6 @@ export default function HomeUser() {
                     onGetPost={() => handleDeleteBlog(blog.id)}
                   />
                 ))
-              ) : (
-                <p>Aun no tienes blogs</p>
               )}
             </div>
           </section>

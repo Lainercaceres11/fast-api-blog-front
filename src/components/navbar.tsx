@@ -13,6 +13,7 @@ export default function Navbar({ user, loading, logout }: NavbarProps) {
       <div className="mx-auto max-w-7xl px-5 pb-14 sm:px-8">
         <header className="flex items-center justify-between border-b border-[#dce3dd] py-5">
           <Link
+            viewTransition
             className="inline-flex items-center gap-2.25 text-[25px] font-bold text-[#20342f] no-underline"
             to="/"
             aria-label="Margen, inicio"
@@ -37,11 +38,16 @@ export default function Navbar({ user, loading, logout }: NavbarProps) {
               <>
                 {!user ? (
                   <>
-                    <Link className="text-[#39554a] no-underline" to="/login">
+                    <Link
+                      viewTransition
+                      className="text-[#39554a] no-underline"
+                      to="/login"
+                    >
                       Iniciar sesión
                     </Link>
 
                     <Link
+                      viewTransition
                       className="rounded-sm bg-[#203b34] px-3 py-2 text-[#f5f2e9] no-underline transition hover:bg-[#395e50]"
                       to="/register"
                     >
@@ -51,6 +57,7 @@ export default function Navbar({ user, loading, logout }: NavbarProps) {
                 ) : (
                   <>
                     <Link
+                      viewTransition
                       className="rounded-sm bg-[#203b34] px-3 py-2 text-[#f5f2e9] no-underline transition hover:bg-[#395e50]"
                       to="/home"
                     >
@@ -58,6 +65,7 @@ export default function Navbar({ user, loading, logout }: NavbarProps) {
                     </Link>
 
                     <Link
+                      viewTransition
                       className="rounded-sm bg-[#203b34] px-3 py-2 text-[#f5f2e9] no-underline transition hover:bg-[#395e50]"
                       to="/create-post"
                     >

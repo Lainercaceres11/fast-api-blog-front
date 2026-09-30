@@ -1,5 +1,6 @@
 import {
   BrowserRouter,
+  Navigate,
   Route,
   Routes,
   useLocation,
@@ -13,6 +14,7 @@ import CretePostPage from "../pages/create-post";
 import Navbar from "../components/navbar";
 import { useUser } from "../context/user-context";
 import EditPost from "../components/blogs/edit-post";
+import { ProtectedRoute } from "./protected-route";
 
 export default function Router() {
   return (
@@ -30,7 +32,9 @@ function RouterContent() {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/", {
+      viewTransition: true,
+    });
   };
 
   return (
@@ -40,13 +44,16 @@ function RouterContent() {
       )}
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/home" element={<HomeUser />} />
-
-        <Route path="/create-post" element={<CretePostPage />} />
-        <Route path="/edit-post/:user_id/:blog_id" element={<EditPost />} />
-
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/home" element={<HomeUser />} />
+          <Route path="/create-post" element={<CretePostPage />} />
+          <Route path="/edit-post/:user_id/:blog_id" element={<EditPost />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );

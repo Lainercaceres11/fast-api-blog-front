@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useNavigate } from "react-router";
 
 type FormField = {
@@ -8,6 +8,8 @@ type FormField = {
   password: string;
 };
 export default function Register() {
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const [form, setForm] = useState<FormField>({
     email: "",
@@ -26,20 +28,26 @@ export default function Register() {
 
   const handleSubmit = async (event: React.SubmitEvent) => {
     event.preventDefault();
-    const response = await fetch(
-      `${import.meta.env.VITE_BACKEND_URL}/auth/register`,
-      {
-        method: "POST",
-        body: JSON.stringify(form),
-        headers: {
-          "Content-Type": "application/json",
+    startTransition(async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/register`,
+        {
+          method: "POST",
+          body: JSON.stringify(form),
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      },
-    );
+      );
 
-    if (response.ok) {
-      navigate("/login");
-    }
+      if (response.ok) {
+        navigate("/login", {
+          viewTransition: true,
+        });
+      } else {
+        setError("No se pudo registrar el usuario. Revisa los campos.");
+      }
+    });
   };
   return (
     <div className="min-h-screen bg-[#f3f5f0] bg-[radial-gradient(#39554a0c_0.7px,transparent_0.7px)] bg-size-[9px_9px] px-[5%] font-(family-name:--font-body) text-[#20342f]">
@@ -147,6 +155,7 @@ export default function Register() {
             <label className="grid gap-1.75 text-[11px] font-bold text-[#39554a]">
               <span>Nombre de usuario</span>
               <input
+                required
                 value={form.username}
                 onChange={handleChangeForm}
                 className="min-h-11.5 w-full rounded-xs border border-[#d5ded6] bg-[#fbfcf9] px-3.25 text-xs font-normal text-[#20342f] outline-none transition focus:border-[#557565] focus:ring-[3px] focus:ring-[#557565]/10"
@@ -159,6 +168,7 @@ export default function Register() {
             <label className="grid gap-1.75 text-[11px] font-bold text-[#39554a]">
               <span>Nombre completo</span>
               <input
+                required
                 onChange={handleChangeForm}
                 value={form.fullname}
                 className="min-h-11.5 w-full rounded-xs border border-[#d5ded6] bg-[#fbfcf9] px-3.25 text-xs font-normal text-[#20342f] outline-none transition focus:border-[#557565] focus:ring-[3px] focus:ring-[#557565]/10"
@@ -171,6 +181,7 @@ export default function Register() {
             <label className="grid gap-1.75 text-[11px] font-bold text-[#39554a]">
               <span>Correo electrónico</span>
               <input
+                required
                 onChange={handleChangeForm}
                 value={form.email}
                 className="min-h-11.5 w-full rounded-xs border border-[#d5ded6] bg-[#fbfcf9] px-3.25 text-xs font-normal text-[#20342f] outline-none transition focus:border-[#557565] focus:ring-[3px] focus:ring-[#557565]/10"
@@ -183,6 +194,7 @@ export default function Register() {
             <label className="grid gap-1.75 text-[11px] font-bold text-[#39554a]">
               <span>Contraseña</span>
               <input
+                required
                 onChange={handleChangeForm}
                 value={form.password}
                 className="min-h-11.5 w-full rounded-xs border border-[#d5ded6] bg-[#fbfcf9] px-3.25 text-xs font-normal text-[#20342f] outline-none transition focus:border-[#557565] focus:ring-[3px] focus:ring-[#557565]/10"
@@ -193,15 +205,18 @@ export default function Register() {
               />
             </label>
             <button
-              className="mt-1 flex min-h-12 items-center justify-between rounded-xs border border-[#203b34] bg-[#203b34] px-4 text-xs font-semibold text-[#f5f2e9] transition hover:border-[#395e50] hover:bg-[#395e50]"
+              disabled={isPending}
+              className="mt-1 flex min-h-12 items-center justify-between rounded-xs border border-[#203b34] bg-[#203b34] px-4 text-xs font-semibold text-[#f5f2e9] transition hover:border-[#395e50] hover:bg-[#395e50] disabled:bg-gray-500"
               type="submit"
             >
-              Crear mi cuenta{" "}
+              {isPending ? "Creando mi cuenta..." : " Crear mi cuenta"}
               <span className="text-[17px] text-[#e7b875]" aria-hidden="true">
                 ↗
               </span>
             </button>
           </form>
+
+          {error && <p className="text-red-500 m-2 font-bold">{error}</p>}
           <p className="mt-3.75 text-center text-[10px] leading-[1.6] text-[#87928b]">
             Al continuar, aceptas compartir tus ideas con respeto.
           </p>
