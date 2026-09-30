@@ -1,35 +1,151 @@
-# React + TypeScript + Vite
+﻿# Blog Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Frontend de una aplicación de blogs desarrollada con React, TypeScript y Vite. La app combina una vista pública para leer publicaciones con un espacio personal para usuarios autenticados, donde pueden crear, editar y eliminar sus propios posts.
 
-Currently, two official plugins are available:
+## Descripción del proyecto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Este proyecto es la parte cliente de una plataforma de blogs conectada a un backend en FastAPI. La interfaz permite:
 
-## React Compiler
+- Ver publicaciones públicas en la home
+- Registrarse e iniciar sesión
+- Acceder a un panel personal del usuario
+- Crear nuevos artículos
+- Editar publicaciones propias
+- Eliminar publicaciones
+- Navegar con rutas protegidas según el estado de autenticación
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Tecnologías utilizadas
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+- React 19
+- TypeScript
+- Vite
+- React Router
+- Tailwind CSS
+- Fetch para consumo de la API
+- Variables de entorno con Vite
 
-## Expanding the Oxlint configuration
+## Funcionalidades principales
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### Vista pública
+- Landing page con una presentación estética del blog
+- Listado de publicaciones disponibles
+- Diseño editorial y minimalista
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+### Autenticación
+- Registro de usuario
+- Inicio de sesión
+- Gestión de sesión en localStorage
+- Rutas protegidas para usuarios autenticados
+
+### Panel del usuario
+- Perfil con nombre, usuario y datos básicos
+- Listado de publicaciones propias
+- Estado de la cuenta
+- Acceso a crear y editar posts
+
+### CRUD de posts
+- Crear nueva publicación
+- Ver detalle del contenido en un formato limpio
+- Editar publicación existente
+- Eliminar publicación desde la vista del usuario
+
+## Estructura del proyecto
+
+```text
+src/
+├── App.tsx
+├── main.tsx
+├── components/
+│   ├── home-user.tsx
+│   ├── login.tsx
+│   ├── navbar.tsx
+│   ├── register.tsx
+│   └── blogs/
+│       ├── create-post.tsx
+│       ├── edit-post.tsx
+│       └── post.tsx
+├── context/
+│   └── user-context.tsx
+├── pages/
+│   ├── create-post.tsx
+│   ├── edit-post.tsx
+│   ├── login.tsx
+│   └── register.tsx
+├── routes/
+│   ├── protected-route.tsx
+│   └── router.tsx
+├── types/
+│   └── user.ts
+└── index.css
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Requisitos
+
+- Node.js 18 o superior
+- npm o pnpm
+- Un backend funcionando con la API de blogs
+
+## Instalación
+
+1. Clona el repositorio
+2. Entra a la carpeta del proyecto
+3. Instala las dependencias:
+
+```bash
+npm install
+```
+
+4. Crea un archivo `.env` en la raíz del proyecto con la URL del backend:
+
+```env
+VITE_BACKEND_URL=http://localhost:8000
+```
+
+> Ajusta la URL según el puerto o dominio donde esté corriendo tu API.
+
+## Scripts disponibles
+
+```bash
+npm run dev
+```
+Inicia el servidor de desarrollo de Vite.
+
+```bash
+npm run build
+```
+Genera la versión de producción del proyecto.
+
+```bash
+npm run preview
+```
+Previsualiza la build generada.
+
+```bash
+npm run lint
+```
+Ejecuta el linter del proyecto.
+
+## Conexión con el backend
+
+La aplicación consume la API usando la variable de entorno:
+
+```env
+VITE_BACKEND_URL
+```
+
+Las peticiones principales apuntan a rutas como:
+
+- `/posts`
+- `/posts/user/:userId`
+- `/auth/login`
+- `/auth/register`
+
+La autenticación se realiza con un token JWT guardado en `localStorage` y enviado en el header `Authorization: Bearer ...`.
+
+## Estado de la aplicación
+
+Este proyecto está pensado como un frontend funcional para una plataforma de blogs con autenticación y gestión de contenido. Está preparado para integrarse con un backend REST y ofrece una interfaz moderna, responsiva y orientada a usuarios con edición de contenido.
+
+## Autor
+
+Proyecto desarrollado para una app de blogs con frontend React y backend FastAPI.
