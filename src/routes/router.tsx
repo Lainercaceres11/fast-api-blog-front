@@ -15,6 +15,8 @@ import Navbar from "../components/navbar";
 import { useUser } from "../context/user-context";
 import EditPost from "../components/blogs/edit-post";
 import { ProtectedRoute } from "./protected-route";
+import UserAdmin from "../pages/admin/user-admin";
+import { AdminRoute } from "./protected-admin-route";
 
 export default function Router() {
   return (
@@ -51,6 +53,10 @@ function RouterContent() {
           <Route path="/home" element={<HomeUser />} />
           <Route path="/create-post" element={<CretePostPage />} />
           <Route path="/edit-post/:user_id/:blog_id" element={<EditPost />} />
+        </Route>
+
+        <Route element={<AdminRoute />}>
+          <Route path="/admin/users" element={<UserAdmin />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

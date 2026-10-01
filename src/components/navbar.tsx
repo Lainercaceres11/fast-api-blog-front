@@ -72,6 +72,15 @@ export default function Navbar({ user, loading, logout }: NavbarProps) {
                       Crear post
                     </Link>
 
+                   {user?.role === "admin" && (
+                      <Link
+                        viewTransition
+                        className="rounded-sm bg-[#203b34] px-3 py-2 text-[#f5f2e9] no-underline transition hover:bg-[#395e50]"
+                        to="/admin/users"
+                      >
+                        Admin users
+                      </Link>
+                    )}
                     <button
                       onClick={logout}
                       className="rounded-sm bg-red-800 px-3 py-2 text-[#f5f2e9] no-underline transition hover:bg-[#395e50]"

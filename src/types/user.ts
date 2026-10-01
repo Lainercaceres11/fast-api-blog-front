@@ -4,6 +4,7 @@ export type User = {
   email: string;
   fullname: string;
   disabled: boolean;
+  role: "user" | "admin";
 };
 
 export type Blog = {

@@ -40,6 +40,7 @@ export default function Register() {
         },
       );
 
+
       if (response.ok) {
         navigate("/login", {
           viewTransition: true,
