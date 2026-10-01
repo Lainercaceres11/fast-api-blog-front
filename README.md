@@ -12,7 +12,9 @@ Este proyecto es la parte cliente de una plataforma de blogs conectada a un back
 - Crear nuevos artículos
 - Editar publicaciones propias
 - Eliminar publicaciones
-- Navegar con rutas protegidas según el estado de autenticación
+- Actualizar la información del perfil
+- Administrar usuarios desde una ruta exclusiva para administradores
+- Navegar con rutas protegidas según el estado de autenticación y el rol
 
 ## Tecnologías utilizadas
 
@@ -39,9 +41,17 @@ Este proyecto es la parte cliente de una plataforma de blogs conectada a un back
 
 ### Panel del usuario
 - Perfil con nombre, usuario y datos básicos
+- Edición de nombre, usuario y correo electrónico
 - Listado de publicaciones propias
 - Estado de la cuenta
 - Acceso a crear y editar posts
+
+### Administración de usuarios
+- Acceso restringido a usuarios con rol de administrador en `/admin/users`
+- Tabla con usuario, nombre completo, correo, rol y estado de cuenta
+- Creación de usuarios desde un diálogo con nombre, usuario, correo, contraseña y rol
+- Edición de la información, el rol y el estado de usuarios
+- Acción para desactivar usuarios
 
 ### CRUD de posts
 - Crear nueva publicación
@@ -56,24 +66,35 @@ src/
 ├── App.tsx
 ├── main.tsx
 ├── components/
+│   ├── admin/
+│   │   ├── create-user.tsx
+│   │   ├── update-user.tsx
+│   │   └── user-table.tsx
+│   ├── blogs/
+│   │   ├── create-post.tsx
+│   │   ├── edit-post.tsx
+│   │   └── post.tsx
+│   ├── dialog-wrapper.tsx
 │   ├── home-user.tsx
 │   ├── login.tsx
 │   ├── navbar.tsx
 │   ├── register.tsx
-│   └── blogs/
-│       ├── create-post.tsx
-│       ├── edit-post.tsx
-│       └── post.tsx
+│   └── update-profile.tsx
 ├── context/
 │   └── user-context.tsx
 ├── pages/
+│   ├── admin/
+│   │   └── user-admin.tsx
 │   ├── create-post.tsx
 │   ├── edit-post.tsx
 │   ├── login.tsx
 │   └── register.tsx
 ├── routes/
+│   ├── protected-admin-route.tsx
 │   ├── protected-route.tsx
 │   └── router.tsx
+├── helpers/
+│   └── get-access-token.ts
 ├── types/
 │   └── user.ts
 └── index.css
@@ -139,6 +160,9 @@ Las peticiones principales apuntan a rutas como:
 - `/posts/user/:userId`
 - `/auth/login`
 - `/auth/register`
+- `/auth/user/me` para consultar y actualizar el perfil
+- `/admin/users` para listar y crear usuarios
+- `/admin/users/:userId` para actualizar o desactivar usuarios
 
 La autenticación se realiza con un token JWT guardado en `localStorage` y enviado en el header `Authorization: Bearer ...`.
 
