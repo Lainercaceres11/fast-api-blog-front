@@ -7,6 +7,7 @@ type UserContextType = {
   loading: boolean;
   login: (token: string) => Promise<void>;
   logout: () => void;
+  updateUser: (updatedFields: Partial<User>) => void;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -61,6 +62,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
+  const updateUser = (updatedFields: Partial<User>) => {
+    setUser((currentUser) =>
+      currentUser ? { ...currentUser, ...updatedFields } : currentUser,
+    );
+  };
+
   useEffect(() => {
     const restoreSession = async () => {
       const token = localStorage.getItem("access_token");
@@ -91,6 +98,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         loading,
         login,
         logout,
+        updateUser,
       }}
     >
       {children}

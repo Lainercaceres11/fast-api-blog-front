@@ -1,5 +1,5 @@
 import { useEffect, useState, useTransition } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import type { Blog } from "../../types/user";
 
 type FormField = {
@@ -132,9 +132,12 @@ export default function EditPost() {
     <div className="min-h-screen bg-[#f3f5f0] bg-[radial-gradient(#39554a0c_0.7px,transparent_0.7px)] bg-size-[9px_9px] px-[5%] font-(family-name:--font-body) text-[#20342f]">
       <div className="mx-auto grid w-full max-w-280 grid-cols-1 items-center gap-8 py-6.5 sm:py-9 md:min-h-[calc(100vh-73px)] md:grid-cols-[minmax(0,1fr)_minmax(310px,0.8fr)] md:gap-10 md:py-14 lg:gap-24">
         <section
-          className="relative isolate flex min-h-72.5 flex-col justify-center overflow-hidden bg-[#203b34] px-6.75 py-8.25 text-[#f5f2e9] sm:min-h-85 md:min-h-120 md:px-7.5 md:py-9.5 lg:px-13.5 lg:py-14.5"
+          className="relative isolate flex min-h-72.5 flex-col justify-center overflow-hidden bg-[#203b34] px-6.75 py-8.25 text-[#f5f2e9] sm:min-h-85 md:min-h-120 md:px-7.5 md:py-9.5 lg:px-13.5 lg:py-14.5 space-y-4"
           aria-labelledby="login-title"
         >
+          <Link to="/home" className="text-[#e7b875] hover:text-[#f5f2e9]  text-2xl">
+            ← Volver a tu espacio
+          </Link>
           <div
             aria-hidden="true"
             className="absolute inset-0 -z-10 bg-[radial-gradient(#ffffff12_0.7px,transparent_0.7px)] bg-size-[8px_8px] opacity-40"

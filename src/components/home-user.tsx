@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useUser } from "../context/user-context";
 
 import Post from "./blogs/post";
+import UpdateProfile, { type UpdateProfileProps } from "./update-profile";
+import { getAccessToken } from "../helpers/get-access-token";
 
 type Blog = {
   id: number;
@@ -10,10 +12,14 @@ type Blog = {
 };
 
 export default function HomeUser() {
-  const { user } = useUser();
+  const { user, updateUser } = useUser();
 
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const token = getAccessToken();
 
   const getBlogs = async () => {
     setLoading(true);
@@ -21,8 +27,6 @@ export default function HomeUser() {
       setLoading(false);
       return;
     }
-
-    const token = localStorage.getItem("access_token");
 
     if (!token) {
       setLoading(false);
@@ -74,6 +78,36 @@ export default function HomeUser() {
     .map((part) => part[0])
     .join("");
 
+  const handleUpdateProfile = async (
+    userInfo: UpdateProfileProps["userInfo"],
+  ) => {
+    setIsUpdating(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/user/me`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(userInfo),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error updating profile: ${response.status}`);
+      }
+
+      updateUser(userInfo);
+      setIsOpenModal(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#f3f5f0] font-(family-name:--font-body) text-[#20342f]">
       <section className="mx-auto max-w-7xl px-5 pb-16 pt-8 sm:px-8 sm:pt-11">
@@ -122,6 +156,7 @@ export default function HomeUser() {
               ) : (
                 blogs.map((blog, index) => (
                   <Post
+                    key={blog.id}
                     userId={user.id}
                     blog={blog}
                     index={index}
@@ -183,6 +218,21 @@ export default function HomeUser() {
                 {user.disabled ? "Cuenta desactivada" : "Cuenta activa"}
               </span>
             </div>
+
+            <button
+              onClick={() => setIsOpenModal(true)}
+              className="mt-5 rounded-sm border border-[#c9d4cc] px-3 py-2 text-xs font-semibold text-[#39554a] transition hover:border-[#39554a] hover:bg-[#e8eee8]"
+            >
+              Editar perfil
+            </button>
+
+            <UpdateProfile
+              isUpdating={isUpdating}
+              onUpdateProfile={handleUpdateProfile}
+              userInfo={user}
+              isOpen={isOpenModal}
+              onClose={() => setIsOpenModal(false)}
+            />
           </aside>
         </div>
 
